@@ -47,12 +47,13 @@ async function getTimeZone(){
 
     const localDate = document.querySelector('#date');
     const updateLocalTime = ()=>{
-        setInterval(updateLocalTime, 60000)
+        
         updateTime();
         localDate.textContent = time;
         
     }
-
+    setInterval(updateLocalTime, 1000)
+    
     updateLocalTime();
     
     
