@@ -25,21 +25,28 @@ const delCard = ()=>{
 
 let lat;
 let lon;
-let timezoneName;
+let timeZone;
 let time;
 
-async function coordTime(){
+
+
+async function getTimeZone(){
     let targetDate = new Date()
     let timestamp = targetDate.getTime()/1000 + targetDate.getTimezoneOffset() * 60 // Current UTC date/time expressed as seconds since midnight, January 1, 1970 UTC
     //const key = AIzaSyCZ1jTDy5GspXb3RbXihi62uYxmoUOG1FM;
     const response = await fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${lat}%2C${lon}&timestamp=${timestamp}&key=AIzaSyCZ1jTDy5GspXb3RbXihi62uYxmoUOG1FM`, {mode: 'cors'});
     const data = await response.json();
+    timeZone = data.timeZoneId;
     console.log(data);
 
-    timezoneName = response.timeZoneName;
-    console.log(timezoneName);
+    let offset = data.rawOffset;
+    time = new Date( new Date().getTime() + offset * 1000).toUTCString().replace( / GMT$/, "" );
+    console.log(time);
+    
     throw new Error(response.status);
 }
+
+
 
 async function addCard(){
     const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${inputValue}&APPID=b69d4590fd811fb3897f54a978061a9b`, {mode:'cors'})
@@ -55,6 +62,10 @@ async function addCard(){
     location.id = 'location';
     location.textContent = data.name + ', ' + data.sys.country; 
     card.appendChild(location);
+
+    const date = document.createElement('h3');
+    date.id = 'date';
+    card.appendChild(date);
 
     const type = document.createElement('h3');
     type.id = 'weatherType';
@@ -77,12 +88,22 @@ async function addCard(){
     lon = data.coord.lon;
     //console.log(coord);
 
-    coordTime();
+    getTimeZone();
+    
+    const updateTime = ()=>{
+    setTimeout('updateTime()', 1000);
+    const date = document.querySelector('#date');
+    date.textContent = time;
+    }
+
+    updateTime();
 
     throw new Error(response.status);
 
     
+    
 }
+
 
 
 start();
