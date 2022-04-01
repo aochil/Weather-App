@@ -27,8 +27,12 @@ let lat;
 let lon;
 let timeZone;
 let time;
+let offset;
 
-
+const updateTime = ()=>{
+        time = new Date( new Date().getTime() + offset * 1000).toUTCString().replace( / GMT$/, "" );
+        console.log(time);
+    }
 
 async function getTimeZone(){
     let targetDate = new Date()
@@ -39,12 +43,23 @@ async function getTimeZone(){
     timeZone = data.timeZoneId;
     console.log(data);
 
-    let offset = data.rawOffset;
-    time = new Date( new Date().getTime() + offset * 1000).toUTCString().replace( / GMT$/, "" );
-    console.log(time);
+    offset = data.rawOffset;
+
+    const localDate = document.querySelector('#date');
+    const updateLocalTime = ()=>{
+        setInterval(updateLocalTime, 60000)
+        updateTime();
+        localDate.textContent = time;
+        
+    }
+
+    updateLocalTime();
+    
     
     throw new Error(response.status);
-}
+
+    
+};
 
 
 
@@ -89,14 +104,8 @@ async function addCard(){
     //console.log(coord);
 
     getTimeZone();
-    
-    const updateTime = ()=>{
-    setTimeout('updateTime()', 1000);
-    const date = document.querySelector('#date');
-    date.textContent = time;
-    }
 
-    updateTime();
+    
 
     throw new Error(response.status);
 
